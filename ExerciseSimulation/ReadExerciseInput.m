@@ -1,5 +1,6 @@
 function [tdata,AoP,PLV,Flow,MeanFlow] = ReadExerciseInput(data)
-
+% This function processes the experimental data, pressures (aortic and LV) and
+% LAD flow. 
 dt    = 1/500;
 AoP   = data(:,2);
 PLV   = 0.85*(data(:,3)-17);

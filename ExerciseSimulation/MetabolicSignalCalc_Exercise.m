@@ -1,94 +1,101 @@
-function test = MetabolicSignalCalc_Exercise(test, So, MetabolicDrive)
+function State = MetabolicSignalCalc_Exercise(State, So, MetSignal)
+% This function calculates the metabolic signal for the rest/exercise
+% simulation cases. The inputs are:
+% State = Rest/Exercise
+% So = ATP release parameter, will not be used for MetSignal models other
+% than ATP-dependent.
+% Metaboli
 
-
-[Q_endo, Q_mid, Q_epi] = CycleAvg_Exercise(test, 'Q1');
+[Q_endo, Q_mid, Q_epi] = CycleAvg_Exercise(State, 'Q1');
 
 R_MVO2 = 1.5; % Endo to Epi MVO2 ratio
+% Extra parameters for ATP-dependent model (Pradhan et al. 2016)
 Vc = 0.04;
 J0 = 283.388e3;
 Ta = 28.151;
 C0 = 476;
 
-q_endo = Q_endo*60 / (test.LVweight); % the last 1/3 is roughly for subendo layer
-q_mid = Q_mid*60 / (test.LVweight); % the last 1/3 is roughly for mid layer
-q_epi = Q_epi*60 / (test.LVweight); % the last 1/3 is roughly for subepi layer
+q_endo = Q_endo*60 / (State.LVweight); % the last 1/3 is roughly for subendo layer
+q_mid = Q_mid*60 / (State.LVweight); % the last 1/3 is roughly for mid layer
+q_epi = Q_epi*60 / (State.LVweight); % the last 1/3 is roughly for subepi layer
 
-Ht = test.HCT/100;
+Ht = State.HCT/100; % Hematocrit
 
-Sa = test.ArtO2Sat/100;
-Sv = test.CvO2Sat/100;
+Sa = State.ArtO2Sat/100; % Arterial O2 sat.
+Sv = State.CvO2Sat/100;  % Venous 2 sat.
 
-test.Mtotal = test.Exercise_LvL*test.MVO2;
+State.Mtotal = State.Exercise_LvL*State.MVO2;
 
 % divide the Mtotal to layers
 Mendo = R_MVO2/(3/2*(R_MVO2+1));
 Mmid  = ((R_MVO2+1)/2)/(3/2*(R_MVO2+1));
 Mepi  = 1/(3/2*(R_MVO2+1));
 
-test.endo.MVO2 = test.Mtotal*Mendo;
-test.mid.MVO2 = test.Mtotal*Mmid;
-test.epi.MVO2 = test.Mtotal*Mepi;
+State.endo.MVO2 = State.Mtotal*Mendo;
+State.mid.MVO2 = State.Mtotal*Mmid;
+State.epi.MVO2 = State.Mtotal*Mepi;
 
-test.endo.Tv = Vc*Ht*J0*So/(q_endo*(Sa-Sv)) * exp(-Sa/So) * ( exp( (Sa-Sv)/So ) - 1) + Ta;
-test.mid.Tv  = Vc*Ht*J0*So/(q_mid*(Sa-Sv)) * exp(-Sa/So) * ( exp( (Sa-Sv)/So ) - 1) + Ta;
-test.epi.Tv  = Vc*Ht*J0*So/(q_epi*(Sa-Sv)) * exp(-Sa/So) * ( exp( (Sa-Sv)/So ) - 1) + Ta;
+% Fund the venous ATP concentration
+State.endo.Tv = Vc*Ht*J0*So/(q_endo*(Sa-Sv)) * exp(-Sa/So) * ( exp( (Sa-Sv)/So ) - 1) + Ta;
+State.mid.Tv  = Vc*Ht*J0*So/(q_mid*(Sa-Sv)) * exp(-Sa/So) * ( exp( (Sa-Sv)/So ) - 1) + Ta;
+State.epi.Tv  = Vc*Ht*J0*So/(q_epi*(Sa-Sv)) * exp(-Sa/So) * ( exp( (Sa-Sv)/So ) - 1) + Ta;
 
-test.endo.dS = Sv;
-test.mid.dS  = Sv;
-test.epi.dS  = Sv;
+State.endo.dS = Sv;
+State.mid.dS  = Sv;
+State.epi.dS  = Sv;
 
-test.endo.Sv = Sa - test.endo.MVO2/(C0*Ht*q_endo);
-test.mid.Sv  = Sa - test.mid.MVO2/(C0*Ht*q_mid);
-test.epi.Sv  = Sa - test.epi.MVO2/(C0*Ht*q_epi);
+State.endo.Sv = Sa - State.endo.MVO2/(C0*Ht*q_endo);
+State.mid.Sv  = Sa - State.mid.MVO2/(C0*Ht*q_mid);
+State.epi.Sv  = Sa - State.epi.MVO2/(C0*Ht*q_epi);
 
-switch MetabolicDrive
+switch MetSignal
     case 'QM'
         
-        test.endo.MetSignal = test.endo.MVO2*q_endo;
-        test.mid.MetSignal = test.mid.MVO2*q_mid;
-        test.epi.MetSignal = test.epi.MVO2*q_epi;
+        State.endo.MetSignal = State.endo.MVO2*q_endo;
+        State.mid.MetSignal = State.mid.MVO2*q_mid;
+        State.epi.MetSignal = State.epi.MVO2*q_epi;
         
     case 'ATP'
         
-        test.endo.MetSignal = test.endo.Tv;
-        test.mid.MetSignal  = test.mid.Tv;
-        test.epi.MetSignal  = test.epi.Tv;
+        State.endo.MetSignal = State.endo.Tv;
+        State.mid.MetSignal  = State.mid.Tv;
+        State.epi.MetSignal  = State.epi.Tv;
         
     case 'VariableSV'
         
-        test.endo.MetSignal = max(test.endo.Sv,0);
-        test.mid.MetSignal  = max(test.mid.Sv,0);
-        test.epi.MetSignal  = max(test.epi.Sv,0);
+        State.endo.MetSignal = max(State.endo.Sv,0);
+        State.mid.MetSignal  = max(State.mid.Sv,0);
+        State.epi.MetSignal  = max(State.epi.Sv,0);
         
     case 'Generic'
         
-        test.endo.MetSignal = test.endo.dS;
-        test.mid.MetSignal  = test.mid.dS;
-        test.epi.MetSignal  = test.epi.dS;
+        State.endo.MetSignal = State.endo.dS;
+        State.mid.MetSignal  = State.mid.dS;
+        State.epi.MetSignal  = State.epi.dS;
         
     case 'MVO2'
         
-        test.endo.MetSignal = test.endo.MVO2;
-        test.mid.MetSignal = test.mid.MVO2;
-        test.epi.MetSignal = test.epi.MVO2;
+        State.endo.MetSignal = State.endo.MVO2;
+        State.mid.MetSignal = State.mid.MVO2;
+        State.epi.MetSignal = State.epi.MVO2;
         
     case 'QdS'
         
-        test.endo.MetSignal = q_endo*(Sa-Sv);
-        test.mid.MetSignal = q_mid*(Sa-Sv);
-        test.epi.MetSignal = q_epi*(Sa-Sv);
+        State.endo.MetSignal = q_endo*(Sa-Sv);
+        State.mid.MetSignal = q_mid*(Sa-Sv);
+        State.epi.MetSignal = q_epi*(Sa-Sv);
         
     case 'Q'
         
-        test.endo.MetSignal = q_endo;
-        test.mid.MetSignal = q_mid;
-        test.epi.MetSignal = q_epi;
+        State.endo.MetSignal = q_endo;
+        State.mid.MetSignal = q_mid;
+        State.epi.MetSignal = q_epi;
         
     case 'M2'
         
-        test.endo.MetSignal = test.endo.MVO2^2;
-        test.mid.MetSignal = test.mid.MVO2^2;
-        test.epi.MetSignal = test.epi.MVO2^2;
+        State.endo.MetSignal = State.endo.MVO2^2;
+        State.mid.MetSignal = State.mid.MVO2^2;
+        State.epi.MetSignal = State.epi.MVO2^2;
         
 end
 

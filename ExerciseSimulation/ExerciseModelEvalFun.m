@@ -1,14 +1,20 @@
-function [Rest, Exercise] = ExerciseModelEvalFun2(xendo,xmid,xepi, Control, MetSignal)
-
-
-%% Read aortic and left venctricular pressure from the
+function [Rest, Exercise] = ExerciseModelEvalFun(xendo,xmid,xepi, Control, MetSignal)
+% This function couples the two models. The inputs are:
+% xendo: optimized parameters for subendocardial layer
+% xmid: optimized parameters for midwall layer
+% xepi: optimized parameters for subepicardial layer
+% Control: the initialization data
+% MetSignal: {'QM','ATP','VariableSV','Generic','MVO2','QdS','Q','M2'};
+% The outputs are two data structures: Rest and Exercise for each case
+% The experimental data are read within this function.
+%% Read aortic and left venctricular pressure from excel file containing data
 data_rest = xlsread('TuneExercisePig','2713 Resting','B9:D5005');
 data_exercise = xlsread('TuneExercisePig','2713 Exercise Level 2','B9:D5005');
 
 [tdata_R,AoP_R,PLV_R,Flow_R, FlowExpRest] = ReadExerciseInput(data_rest);
 [tdata_E,AoP_E,PLV_E,Flow_E, FlowExpEx] = ReadExerciseInput(data_exercise);
 
-% Assign baseline blood gas measurements from CPP=120 mmHg case (k = 5), Pig C
+% Assign blood gas measurements from CPP=120 mmHg case (k = 5), Pig C
 k = 5;
 Init.ArtO2Cnt   = Control.ArtO2Cnt(k);
 Init.CVO2Cnt    = Control.CVO2Cnt(k);
@@ -21,13 +27,16 @@ Init.HCT        = Control.HCT(k);
 Init.VisRatio   = Control.VisRatio(k);
 Init.LVweight   = Control.LVweight;
 
-%% Rest
-Init.Exercise_LvL = 1.00;
-MVO2 = 60;
-Init.MVO2 = Init.Exercise_LvL*MVO2;
+%% First we simulate rest
+% structure init is formed to initialize the rest structure.
+Init.Exercise_LvL = 1.00; % 1.00 means no exercise, MVO2 remains unchanged
+MVO2 = 60; % Rest MVO2
+Init.MVO2 = Init.Exercise_LvL*MVO2; 
 
+% Initialize the parameters of the circulation model
 Init.Params = PerfusionModel_ParamSet();
 
+% Copy experimental data to Init structure
 Init.t = tdata_R;
 Init.dt = mean(diff(Init.t));
 Init.AoP = AoP_R;
@@ -36,37 +45,47 @@ Init.Qexp = Flow_R;
 [~, Init.T] = LeftVenPerssure(Init.AoP,Init.t,Init.dt);
 Init.HR = 60/Init.T;
 
+% Run an initialization and calculate cycle-to-cycle averages with the
+% initalization
 Init.Results = PerfusionModel( Init, 0);
 Init =   Calculations_Exercise(Init, 'Baseline');
 
-%% Initialize Rest
-
+% Copy initialization to Rest
 Rest = Init;
-
 QPA = Rest.QPA;
 
-%% Run Rest
-
+%% Run rest
+% The while loop iterates over the two models successively, starting with
+% the representative vessel model. Given the cycle-to-cycle averages, the
+% equivalent diameter and associated quantities (activation, metabolic,
+% myogenic, and autonomic signals) are computed using representative vessel
+% model (Step 1). Then, microvascular compliances C11, C12, and C13 are 
+% calculated and updated (Step 2). And Lastly, the hemodynamics are updated
+% in the myocardial circulatio model (Step 3). Step 1 - Step 3 are done 
+% iteratively until total flow is converged or the 50 iterations are done.  
 err = 10;
 c = 1;
 while err>1e-3 && c<50
     
+    %% Step 1 - Representative vessel model
     [Rest.endo.D, Rest.Act_Endo, Rest.S_myo_Endo, Rest.S_meta_Endo, Rest.S_HR_Endo] = RepModel_Exercise(Rest, Control, 'endo', xendo, MetSignal);
     
     [Rest.mid.D, Rest.Act_Mid, Rest.S_myo_Mid, Rest.S_meta_Mid, Rest.S_HR_Mid] = RepModel_Exercise(Rest, Control, 'mid', xmid, MetSignal);
     
     [Rest.epi.D, Rest.Act_Epi, Rest.S_myo_Epi, Rest.S_meta_Epi, Rest.S_HR_Epi] = RepModel_Exercise(Rest, Control, 'epi', xepi, MetSignal);
-    
+
+    %% Step 2 - Approximation of microvascular resistances
     [C11, C12, C13] = ComplianceResistance(Rest);
     
     Rest.Params.C11 = C11;
     Rest.Params.C12 = C12;
     Rest.Params.C13 = C13;
     
+    %% Step 3 - Myocardial circulation model
     Rest.Results = PerfusionModel( Rest, 0);
-    
     Rest =   Calculations_Exercise(Rest, 'Exercise');
-       
+    
+    %% Check the convergence error and update
     err = abs(QPA - Rest.QPA);
     QPA = Rest.QPA;
     
@@ -75,7 +94,7 @@ while err>1e-3 && c<50
 end
 Rest.Results = PerfusionModel( Rest, 1);
 
-%% Initialize Exercise
+%% The we simulate exercise
 Init.Exercise_LvL = 1.32;
 MVO2 = 60;
 Init.MVO2 = Init.Exercise_LvL*MVO2;
@@ -103,22 +122,25 @@ err = 10;
 c = 1;
 while err>1e-3 && c<50
     
+     %% Step 1 - Representative vessel model
     [Exercise.endo.D, Exercise.Act_Endo, Exercise.S_myo_Endo, Exercise.S_meta_Endo, Exercise.S_HR_Endo] = RepModel_Exercise(Exercise, Control, 'endo', xendo, MetSignal);
     
     [Exercise.mid.D, Exercise.Act_Mid, Exercise.S_myo_Mid, Exercise.S_meta_Mid, Exercise.S_HR_Mid] = RepModel_Exercise(Exercise, Control, 'mid', xmid, MetSignal);
     
     [Exercise.epi.D, Exercise.Act_Epi, Exercise.S_myo_Epi, Exercise.S_meta_Epi, Exercise.S_HR_Epi] = RepModel_Exercise(Exercise, Control, 'epi', xepi, MetSignal);
     
+    %% Step 2 - Approximation of microvascular resistances    
     [C11, C12, C13] = ComplianceResistance(Exercise);
     
     Exercise.Params.C11 = C11;
     Exercise.Params.C12 = C12;
     Exercise.Params.C13 = C13;
-    
+
+    %% Step 3 - Myocardial circulation model
     Exercise.Results = PerfusionModel( Exercise, 0);
-    
     Exercise =   Calculations_Exercise(Exercise, 'Exercise');
-       
+    
+    %% Check the convergence error and update       
     err = abs(QPA - Exercise.QPA);
     QPA = Exercise.QPA;
     
@@ -132,7 +154,6 @@ Exercise.Results = PerfusionModel( Exercise, 1);
 
 figure;
 
-%% Check these values please!
 subplot(1,2,1);hold on
 plot(1,FlowExpRest,'k+','MarkerSize',12,'LineWidth',2);
 plot(1,60*Rest.QPA,'ko','MarkerSize',8,'linewidth',2);

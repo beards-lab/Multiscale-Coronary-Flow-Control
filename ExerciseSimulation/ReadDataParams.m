@@ -7,23 +7,18 @@ BloodGasMeasurementReading;
 Control =   Calculations(Control);
 Control = RepVessel(Control);
 
-
-
-%% What is the Metabolic Signal?
+%% What is the Metabolic Signal? The top ranking model is chosen here: QM
 
 MetOptions = {'QM','ATP','VariableSV','Generic','MVO2','QdS','Q','M2'};
 MetSignal = MetOptions{1};
 
 %% Read the estimated rep. vessel model parameters
-    
 fileID = 'Params.txt';
 fid = fopen(fileID,'rt');
 tline1 = fgets(fid);
 tline2 = fgets(fid);
 tline3 = fgets(fid);
-
 eval(tline1);eval(tline2);eval(tline3);
-
 fclose('all');
 
 

@@ -1,5 +1,12 @@
 function [C11, C12, C13] = ComplianceResistance(Case)
-
+% This function calculates the compliances based on the equivalent diameter
+% and the hemodynamics of in each myocardial layer. The subendocardial
+% compliance is calculated using the intervals of the cardiac cycle when
+% changes of the transmural pressure are not significant(by taking the
+% derivative). This is due significant variations of transmural pressure in
+% the subendocardial layer which imposes numerical problems in finding the 
+% compliance. The subepicardial and midwall are calculated using results
+% of over the whole cardiac cycle.
 
 Rn = Case.Rn;
 
@@ -37,6 +44,8 @@ Rendo = (C_R13./mRendo)*Rendo;
 Rmid = (C_R12./mRmid)*Rmid;
 Repi = (C_R11./mRepi)*Repi;
 
+% The next two lines finds intervals where subendocardial transmural
+% pressure does not drastically change
 dPCdt = TwoPtDeriv(Case.endo.PC,mean(diff(t)));
 Cidx = find(abs(dPCdt)<50);
 
