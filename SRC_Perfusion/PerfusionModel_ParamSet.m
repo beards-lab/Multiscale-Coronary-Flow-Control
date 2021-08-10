@@ -1,6 +1,10 @@
 function Params = PerfusionModel_ParamSet()
 
-% PARAMETERS
+% Parameters of the myocardial perfusion model are assigned here. The
+% microvascular compliances C11, C12, and C13 are initialied here, but they
+% will change as a result of the two way coupling between the myocardial
+% circulation model and representative vessel model. 
+
 Params.C_PA = 0.0013/3;  % mL / mmHg
 Params.L_PA = 2.0; % mmHg / (mL sec)
 Params.R_PA = 4; % mmHg / (mL / sec)

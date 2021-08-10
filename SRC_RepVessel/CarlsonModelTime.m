@@ -1,4 +1,15 @@
 function [D, A, S_myo, S_meta, S_HR, R0, conv] = CarlsonModelTime(Params, P, D, MetSignal, HR, Dc, Pc, state)
+% Model of the representative vessel model based on Carlson & Secomb 2005.
+% The inuts are
+% Params: parameteres of representative vessel model
+% P: The transmral pressure
+% D: Equivalen diameter (will be updated in function)
+% MetSignal : Metabolic signal, top performing considered here: QM
+% HR : heart rate
+% Dc : A reference diameter
+% Pc : A reference pressure
+% state: normal: with vasoreactivity, passive, or constricted (fully
+% active)
 
 Cp          = Params(1);
 Ap          = Params(2);
@@ -29,55 +40,54 @@ gD = 1/tD*Dc/Tc;
 gA = 1/tA;
 
 
-for i = 1:length(P)
-    
-    X0 = [100, 0.5];
-    
-    V.MetSignal = MetSignal(i);
-    V.Params = Params(:);
-    V.HR = HR(i);
-    V.gD = gD;
-    V.gA = gD;
-    V.State = state;
-    V.Pressure = P(i);
-    
-    [t, X] = ode15s(@dXdt_RepVessel, [0 200], X0, [], V);
-    
-    D(i) = X(end,1);
-    A(i) = X(end,2);
-    
-    R = D(i)/2;
-    
-    T = V.Pressure*R;
-    
-%     [T_pass, T_max] = Tension(R, V.Params);
-    
-    switch V.State
-        case 'normal'
-            
-            S_myo(i) = max(C_myo*T*133.32/1e6,0);
-            
-            S_meta(i) = C_met*V.MetSignal;
-            
-            S_HR(i) = C_HR*max(V.HR-HR0,0);
-                      
-        case 'passive'
-            A(i) = 0;
-        case 'constricted'
-            A(i) = 1;
-    end
-    
-    %% Check if the solution is converged!
-    dtx = diff(t);
-    dDdt = gradient(X(:,2),mean(dtx));
 
-    if abs(dDdt(end)) < 1e-4
-        conv(i) = 0;
-    else
-        conv(i) = -1;
-    end
-    
+X0 = [100, 0.5];
+
+V.MetSignal = MetSignal;
+V.Params = Params(:);
+V.HR = HR;
+V.gD = gD;
+V.gA = gD;
+V.State = state;
+V.Pressure = P;
+
+[t, X] = ode15s(@dXdt_RepVessel, [0 200], X0, [], V);
+
+D = X(end,1);
+A = X(end,2);
+
+R = D/2;
+
+T = V.Pressure*R;
+
+%     [T_pass, T_max] = Tension(R, V.Params);
+
+switch V.State
+    case 'normal'
+        
+        S_myo = max(C_myo*T*133.32/1e6,0);
+        
+        S_meta = C_met*V.MetSignal;
+        
+        S_HR = C_HR*max(V.HR-HR0,0);
+        
+    case 'passive'
+        A = 0;
+    case 'constricted'
+        A = 1;
 end
+
+%% Check if the solution is converged!
+dtx = diff(t);
+dDdt = gradient(X(:,2),mean(dtx));
+
+if abs(dDdt(end)) < 1e-4
+    conv = 0;
+else
+    conv = -1;
+end
+
+
 
 
 
