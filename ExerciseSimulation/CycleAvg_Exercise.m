@@ -1,5 +1,8 @@
 function [var_endo, var_mid, var_epi] = CycleAvg_Exercise(test, var)
-
+% Calculates the cycle to cycle averages for different variables that are
+% defined for all layers. Inputs are 
+% test : the structure that includes each state of simulation
+% (rest/exercise/init)
    
 eval(['SubendoVar = test.Results.',var,'3;']);
 eval(['MidVar = test.Results.',var,'2;']);

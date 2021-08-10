@@ -4,7 +4,8 @@ function State = MetabolicSignalCalc_Exercise(State, So, MetSignal)
 % State = Rest/Exercise
 % So = ATP release parameter, will not be used for MetSignal models other
 % than ATP-dependent.
-% Metaboli
+% MetSignal : Metabolic signal, top performing considered here: QM
+% Output is State structure which includes the metabolic signal mag.
 
 [Q_endo, Q_mid, Q_epi] = CycleAvg_Exercise(State, 'Q1');
 
