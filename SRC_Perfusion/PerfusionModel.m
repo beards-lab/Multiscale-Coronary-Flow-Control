@@ -1,6 +1,6 @@
 function Results = PerfusionModel(Case, flg)
 
-%% Exercise is modeled using the aortic pressure as the input pressure.
+%% Rest/exercise is modeled using the aortic pressure as the input pressure.
 Xo_myo = [Case.AoP(1) 1 50 50 85 85 120 120 5]'; % for 2713 Resting
 
 t_final = Case.t(end);
