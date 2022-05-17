@@ -159,24 +159,24 @@ set(gca,'Fontsize',16)
 
 if figures_on == 1
     if k == 1 
-        print(h1,'-dpng','Figures/LayerFlow_Control.png')
-        print(h2,'-dpng','Figures/Flow_Control.png')
-        print(h3,'-dpng','Figures/Pressure_Control.png')
-        print(h4,'-dpng','Figures/LayerPressure_Control.png')
+        print(h1,'-dpng','~/Dropbox/UMICH/Coronary/Figures/LayerFlow_Control.png')
+        print(h2,'-dpng','~/Dropbox/UMICH/Coronary/Figures/Flow_Control.png')
+        print(h3,'-dpng','~/Dropbox/UMICH/Coronary/Figures/Pressure_Control.png')
+        print(h4,'-dpng','~/Dropbox/UMICH/Coronary/Figures/LayerPressure_Control.png')
     elseif k == 2
-        print(h1,'-dpng','Figures/LayerFlow_H1.png')
-        print(h2,'-dpng','Figures/Flow_H1.png')
-        print(h3,'-dpng','Figures/Pressure_H1.png')
-        print(h4,'-dpng','Figures/LayerPressure_H1.png')
+        print(h1,'-dpng','~/Dropbox/UMICH/Coronary/Figures/LayerFlow_H1.png')
+        print(h2,'-dpng','~/Dropbox/UMICH/Coronary/Figures/Flow_H1.png')
+        print(h3,'-dpng','~/Dropbox/UMICH/Coronary/Figures/Pressure_H1.png')
+        print(h4,'-dpng','~/Dropbox/UMICH/Coronary/Figures/LayerPressure_H1.png')
     elseif k == 3
-        print(h1,'-dpng','Figures/LayerFlow_H2.png')
-        print(h2,'-dpng','Figures/Flow_H2.png')
-        print(h3,'-dpng','Figures/Pressure_H2.png')
-        print(h4,'-dpng','Figures/LayerPressure_H2.png')
+        print(h1,'-dpng','~/Dropbox/UMICH/Coronary/Figures/LayerFlow_H2.png')
+        print(h2,'-dpng','~/Dropbox/UMICH/Coronary/Figures/Flow_H2.png')
+        print(h3,'-dpng','~/Dropbox/UMICH/Coronary/Figures/Pressure_H2.png')
+        print(h4,'-dpng','~/Dropbox/UMICH/Coronary/Figures/LayerPressure_H2.png')
     else
-        print(h1,'-dpng','Figures/LayerFlow_H3.png')
-        print(h2,'-dpng','Figures/Flow_H3.png')
-        print(h3,'-dpng','Figures/Pressure_H3.png')
-        print(h4,'-dpng','Figures/LayerPressure_H3.png')
+        print(h1,'-dpng','~/Dropbox/UMICH/Coronary/Figures/LayerFlow_H3.png')
+        print(h2,'-dpng','~/Dropbox/UMICH/Coronary/Figures/Flow_H3.png')
+        print(h3,'-dpng','~/Dropbox/UMICH/Coronary/Figures/Pressure_H3.png')
+        print(h4,'-dpng','~/Dropbox/UMICH/Coronary/Figures/LayerPressure_H3.png')
     end 
 end 
