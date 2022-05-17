@@ -35,11 +35,10 @@ S_HR = zeros(1,length(P));
 tD = 1;
 tA = 20;
 Tc = Pc*Dc/2;
-%Tc = P*D/2; 
 Ac = 0.5;
 gD = 1/tD*Dc/Tc;
-%gD = 1/tD*D/Tc
 gA = 1/tA;
+
 
 
 X0 = [100, 0.5];

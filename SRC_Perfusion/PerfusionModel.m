@@ -29,10 +29,11 @@ Qepi = sum(Results.Q11(t_idx).*Dt(t_idx(2:end)))/(2*Case.T);
 Results.ENDOEPI = Qendo/Qepi;
 Results.ENDOMID = Qendo/Qmid;
 
+disp(['ENDO/EPI = ',num2str(Qendo/Qepi)]);    
+
 if flg==1
     
     
-    disp(['ENDO/EPI = ',num2str(Qendo/Qepi)]);    
     
     h1 = figure;hold on;
     plot(t,60*Results.Q13,'b','LineWidth',2);
@@ -78,12 +79,13 @@ if flg==1
     
     figure; hold on;
     plot(Case.t,Case.AoP,'linewidth',1.5);
+    plot(Results.t,Results.P_PA,'linewidth',1.5); 
     plot(Case.t,Case.PLV,'Color',[1 0 0 0.4],'linewidth',1.5);
     ylabel('Pressure (mmHg)');
     xlabel('time (s)');
     box on;
     if Case.Exercise_LvL == 1
-        legend_handle = legend('Aortic','LV','Fontsize',16,'Location','southwest');
+        legend_handle = legend('Aortic','P_{PA}','LV','Fontsize',16,'Location','southwest');
         set(legend_handle, 'box' , 'on')
     end
     ylim([-10 180]);

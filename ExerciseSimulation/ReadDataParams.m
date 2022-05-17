@@ -4,7 +4,7 @@ load ControlPigC.mat
 %% Initialization of blood gas measurements and rep. vessel model based on Pig C
 BloodGasMeasurementReading;
 
-Control =   Calculations(Control);
+Control = Calculations(Control);
 Control = RepVessel(Control);
 
 %% What is the Metabolic Signal? The top ranking model is chosen here: QM

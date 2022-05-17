@@ -33,16 +33,12 @@ eval(['State.Dexp = State.',layer,'.D;']);
 eval(['State.Ptm = State.',layer,'.Ptm;']);
 eval(['MetSignalC = State.',layer,'.MetSignal;']);
 
-eval(['Control.Dexp = Control.',layer,'.D(4);']);
-eval(['Control.Ptm = Control.',layer,'.Ptm(4);']);
-Dc = Control.Dexp; %100
-Pc = Control.Ptm; %1
-
-% a_Dc = State.Dexp/Dc
-% a_Pc = State.Ptm/Pc
+%eval(['Control.Dexp = Control.',layer,'.D(4);']);
+%eval(['Control.Ptm = Control.',layer,'.Ptm(4);']);
+Dc = 100; %Control.Dexp;
+Pc = 1; %Control.Ptm;
 
 % Run the representative vessel model:
-[DE, ActE, S_myo, S_meta, S_HR] = CarlsonModelTime(x, State.Ptm, State.Dexp,...
-    MetSignalC, State.HR, Dc, Pc, st);
+[DE, ActE, S_myo, S_meta, S_HR] = CarlsonModelTime(x, State.Ptm, State.Dexp, MetSignalC, State.HR, Dc, Pc, st);
 
 end

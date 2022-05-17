@@ -47,7 +47,7 @@ Init.HR = 60/Init.T;
 
 % Run an initialization and calculate cycle-to-cycle averages with the
 % initalization
-Init.Results = PerfusionModel( Init, 0);
+Init.Results = PerfusionModel( Init, 1);
 Init =   Calculations_Exercise(Init, 'Baseline');
 
 % Copy initialization to Rest
@@ -65,7 +65,7 @@ QPA = Rest.QPA;
 % iteratively until total flow is converged or the 50 iterations are done.  
 err = 10;
 c = 1;
-while err>1e-3 && c<50
+while err>1e-3 && c<100  %50
     
     %% Step 1 - Representative vessel model
     [Rest.endo.D, Rest.Act_Endo, Rest.S_myo_Endo, Rest.S_meta_Endo, Rest.S_HR_Endo] = RepModel_Exercise(Rest, Control, 'endo', xendo, MetSignal);
@@ -74,9 +74,17 @@ while err>1e-3 && c<50
     
     [Rest.epi.D, Rest.Act_Epi, Rest.S_myo_Epi, Rest.S_meta_Epi, Rest.S_HR_Epi] = RepModel_Exercise(Rest, Control, 'epi', xepi, MetSignal);
 
+%     disp([Rest.endo.D, Rest.Act_Endo, Rest.S_myo_Endo, Rest.S_meta_Endo, Rest.S_HR_Endo; ...
+%         Rest.mid.D, Rest.Act_Mid, Rest.S_myo_Mid, Rest.S_meta_Mid, Rest.S_HR_Mid; ...
+%         Rest.epi.D, Rest.Act_Epi, Rest.S_myo_Epi, Rest.S_meta_Epi, Rest.S_HR_Epi; ...
+%         ])
+
     %% Step 2 - Approximation of microvascular resistances
-    [C11, C12, C13] = ComplianceResistance(Rest);
+    [C11, C12, C13] = ComplianceResistance(Rest); 
     
+%     disp([C11, C12, C13])
+
+
     Rest.Params.C11 = C11;
     Rest.Params.C12 = C12;
     Rest.Params.C13 = C13;
@@ -92,7 +100,12 @@ while err>1e-3 && c<50
     c = c+1;
     
 end
+
+c
+
 Rest.Results = PerfusionModel( Rest, 1);
+
+return 
 
 %% The we simulate exercise
 Init.Exercise_LvL = 1.32;
@@ -152,7 +165,7 @@ Exercise.Results = PerfusionModel( Exercise, 1);
 
 %% Plots
 
-figure;
+figure(101)
 
 subplot(1,2,1);hold on
 plot(1,FlowExpRest,'k+','MarkerSize',12,'LineWidth',2);
@@ -175,7 +188,7 @@ axis([0.5 2.5 0 1.5]);box on;pbaspect([1 2 1]);
 legend('Literature Data','Model','Location','best','Fontsize',13);
 
 
-figure;
+figure(102)
 subplot(1,2,1);
 plot([1 2],[Rest.Act_Epi, Exercise.Act_Epi],'o-','MarkerEdgeColor','r',...
     'MarkerFaceColor','r','LineWidth',2,'Color',[1 0 0 0.3]); hold on;
@@ -200,7 +213,7 @@ axis([0.5 2.5 0.0 1.5]);ylabel('D_n, Normalized Diameter (unitless)','FontName',
 set(gca,'Fontsize',14);
 % legend('subepi','midwall','subendo');
 
-h1 = figure;
+h1 = figure(103);
 
 Rest.Stotal_Epi = Rest.S_myo_Epi - Rest.S_meta_Epi - Rest.S_HR_Epi + xepi(end-1);
 Rest.Stotal_Mid = Rest.S_myo_Mid - Rest.S_meta_Mid - Rest.S_HR_Mid + xmid(end-1);
@@ -244,7 +257,7 @@ set(gca,'xtick',[1,2],'xticklabel',{'Rest','Exercise'},'Fontsize',14);
 xlim([0.5 2.5]);ylabel('S_{HR}','Fontsize',14);pbaspect([1 2 1]);
 set(gca,'Fontsize',14);
 
-figure;
+figure(104);
  
 Rest.S_Epi = [Rest.Stotal_Epi Rest.S_myo_Epi	-Rest.S_HR_Epi  -Rest.S_meta_Epi];
 Rest.S_Mid = [Rest.Stotal_Mid Rest.S_myo_Mid	-Rest.S_HR_Mid  -Rest.S_meta_Mid];
