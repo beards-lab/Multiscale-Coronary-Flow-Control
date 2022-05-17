@@ -1,16 +1,17 @@
 function pars = parameters(data) 
 
 
-%% load data 
-
-t = data.t; 
-T = data.T;
-
-AoPmin = data.AoPmin; 
-Flowmax = data.Flowmax; 
+% %% load data 
+% 
+% t = data.t; 
+% T = data.T;
+% 
+% AoPmin = data.AoPmin; 
+% Flowmax = data.Flowmax; 
 
 %%
 
+% These are scaling factors that Hamid had in his code 
 x = 3; 
 y = 3*x; 
 
@@ -20,7 +21,7 @@ R_PA = 4; % mmHg / (mL / sec) ***
 R_PV = 2; % mmHg / (mL / sec)
 C_PV = 0.0254/x; % mL / mmHg
 
-
+% This is a scaling factor that I implemented for the Hem data
 z = 5; %1; 
 
 Rm_0 = z*44; % mmHg / (mL / sec)

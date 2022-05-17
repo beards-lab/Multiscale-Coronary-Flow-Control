@@ -1,18 +1,18 @@
+% Driver that runs the forward perfusion model 
 
-
-figures_on = 0; 
+printfigs_on = 0; % print plotted figures if printfigs_on = 1
 
 %% Load data 
 
-% load ControlHem_OSS1150.mat ControlHem
-load ControlHamidPaper.mat ControlHem 
+load ControlHem_OSS1150.mat ControlHem
+%load ControlHamidPaper.mat ControlHem 
 
-k = 1; % Control 
+k = 1; % Control = 1; Hemmorhage 1 = 2, Hem 2 = 3, Hem 3 = 4
 Control = ControlHem.Data(k); 
 
 %% Metabolic Signal 
 
-MetOptions = {'QM'}; 
+MetOptions = {'QM'}; %We're only using this one from Hamid's paper
 
 %% Read aortic and left venctricular pressure from excel file containing data
 
@@ -30,6 +30,7 @@ PLV    = Control.PLV;
 Flow   = Control.Flow; 
 dPLVdt = Control.dPLVdt; 
 
+% Calculate max, min, and average pressure 
 M_AoP = max(AoP); 
 m_AoP = min(AoP); 
 [~,locs_M] = findpeaks(AoP,'MinPeakProminence',.5*(M_AoP - m_AoP)); 
@@ -39,6 +40,7 @@ AoPmax = mean(AoP(locs_M));
 AoPmin = mean(AoP(locs_m)); 
 AoPbar = trapz(t(locs_m(end-3):locs_m(end-1)),AoP(locs_m(end-3):locs_m(end-1))) / (t(locs_m(end-1)) - t(locs_m(end-3))); 
 
+% Calculate max, min, and average flow 
 M_Flow = max(Flow); 
 m_Flow = min(Flow); 
 [~,locs_M] = findpeaks(Flow,'MinPeakProminence',.5*(M_Flow - m_Flow)); 
@@ -50,13 +52,13 @@ Flowbar = trapz(t(locs_m(end-3):locs_m(end-1)),Flow(locs_m(end-3):locs_m(end-1))
 
 %% Construct data structure 
 
-data.t = t; 
-data.dt = dt; 
-data.T = T; 
-data.HR = HR; 
-data.AoP = AoP; 
-data.PLV = PLV; 
-data.Flow = Flow; 
+data.t      = t; 
+data.dt     = dt; 
+data.T      = T; 
+data.HR     = HR; 
+data.AoP    = AoP; 
+data.PLV    = PLV; 
+data.Flow   = Flow; 
 data.dPLVdt = dPLVdt; 
 
 % Load interpolants 
@@ -64,9 +66,9 @@ data.AoPspl    = Control.AoPspl;
 data.PLVspl    = Control.PLVspl; 
 data.dPLVdtspl = Control.dPLVdtspl; 
 
-data.AoPmax = AoPmax; 
-data.AoPmin = AoPmin; 
-data.AoPbar = AoPbar; 
+data.AoPmax  = AoPmax; 
+data.AoPmin  = AoPmin; 
+data.AoPbar  = AoPbar; 
 data.Flowmax = Flowmax; 
 data.Flowmin = Flowmin; 
 data.Flowbar = Flowbar; 
@@ -87,7 +89,7 @@ data.LVweight   = Control.LVWeight;
 
 % structure init is formed to initialize the rest structure.
 data.Exercise_LvL = 1.00; % 1.00 means no exercise, MVO2 remains unchanged
-MVO2 = 60; % Rest MVO2
+MVO2      = 60; % Rest MVO2
 data.MVO2 = data.Exercise_LvL*MVO2; 
 
 %% Initialize the parameters of the circulation model
@@ -98,7 +100,8 @@ pars = parameters(data);
 
 Outputs = model_sol(pars,data); 
 
-Q_PA = Outputs.Q_PA * 60; 
+% Scale flows to mL min^{-1}
+Q_PA   = Outputs.Q_PA   * 60; 
 Qa_epi = Outputs.Qa_epi * 60; 
 Qa_mid = Outputs.Qa_mid * 60; 
 Qa_end = Outputs.Qa_end * 60; 
@@ -157,7 +160,7 @@ ylabel('Pressure (mmHg)')
 legend('subendo','midwall','subepi','location','best')
 set(gca,'Fontsize',16)
 
-if figures_on == 1
+if printfigs_on == 1
     if k == 1 
         print(h1,'-dpng','~/Dropbox/UMICH/Coronary/Figures/LayerFlow_Control.png')
         print(h2,'-dpng','~/Dropbox/UMICH/Coronary/Figures/Flow_Control.png')

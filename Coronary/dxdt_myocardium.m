@@ -1,4 +1,17 @@
 function [dxdt, outputs] = dxdt_myocardium(t,x,pars,data,flag)
+%{
+Right hand side of the perfusion model. 
+Inputs: 
+    t - time 
+    x - states
+    pars - adjustable parameter vector 
+    data - data structure passed through all codes 
+    flag - if flag = 0, solves ODE system. If flag = 1, produces auxiliary
+    equation outputs
+Outputs: 
+    dxdt - right hand side of the ODEs 
+    outputs - calculations of other auxiliary equations 
+%} 
 
 %% Data input 
 

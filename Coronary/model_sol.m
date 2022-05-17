@@ -1,4 +1,12 @@
 function Outputs = model_sol(pars,data)
+%{ 
+Calls the model and solver and then compiles all of the outputs 
+Inputs: 
+    pars - parameter vector 
+    data - data structure loaded in 
+Outputs: 
+    Outputs - output structure compiling all results 
+%} 
 
 %% Load in data structure 
 
@@ -9,7 +17,9 @@ T = data.T;
 
 %% Get initial conditions 
 
-% Initial conditions scaled by the 
+% Initial conditions scaled by the average diastolic AoP for each
+% case. Avg baseline for this pig is 96. (Should have code to extract this
+% soon) 
 Init = [data.AoP(1); 
     data.Flow(1)/60; 
     data.AoP(1)/96 * 50; 
@@ -20,7 +30,7 @@ Init = [data.AoP(1);
     data.AoP(1)/96 * 120;
     5]; 
 
-%% Solve model 
+%% Solve the model 
 
 sol = ode15s(@dxdt_myocardium,[0 t_final],Init, [], pars, data, 0);
 sols = deval(t,sol); 
