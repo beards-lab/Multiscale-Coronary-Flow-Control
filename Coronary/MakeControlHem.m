@@ -154,11 +154,11 @@ T = 37 ;
 Viscosity = @(x) 2.03 * exp( (k0 - k3*T)*x - k2*T );
 
 for i = 1:length(PointValues(:,1)) 
-    ControlHem.Data(i).SBP      = PointValues(i,1); 
-    ControlHem.Data(i).DBP      = PointValues(i,2); 
-    ControlHem.Data(i).MBP      = PointValues(i,3); 
-    ControlHem.Data(i).HR       = PointValues(i,4);
-    ControlHem.Data(i).T        = 60 / ControlHem.Data(i).HR; 
+    ControlHem.Data(i).SBP      = PointValues(i,1); % Systolic blood pressure
+    ControlHem.Data(i).DBP      = PointValues(i,2); % Diastolic blood pressure
+    ControlHem.Data(i).MBP      = PointValues(i,3); % Mean blood pressure 
+    ControlHem.Data(i).HR       = PointValues(i,4); % Heart rate 
+    ControlHem.Data(i).T        = 60 / ControlHem.Data(i).HR; % Heart period
     ControlHem.Data(i).CorFlow  = PointValues(i,5); 
     ControlHem.Data(i).PLVmin   = PointValues(i,7); 
     ControlHem.Data(i).dPdtmax  = PointValues(i,8);
@@ -182,6 +182,8 @@ for i = 1:length(PointValues(:,1))
 end 
 
 save ControlHem_OSS1150.mat ControlHem
+
+MBP = (1/3) * SBP + (2/3) * DBP
 
 
 

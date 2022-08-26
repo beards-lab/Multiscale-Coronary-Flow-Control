@@ -1,4 +1,4 @@
-function Outputs = model_sol(pars,data)
+function [Outputs,rout,J] = model_sol(pars,data)
 %{ 
 Calls the model and solver and then compiles all of the outputs 
 Inputs: 
@@ -8,6 +8,8 @@ Outputs:
     Outputs - output structure compiling all results 
 %} 
 
+pars = exp(pars); 
+
 %% Load in data structure 
 
 t = data.t; 
@@ -15,24 +17,27 @@ t_final = t(end);
 dt = data.dt; 
 T = data.T; 
 
+AoP_M = data.AoP_M;
+
 %% Get initial conditions 
 
 % Initial conditions scaled by the average diastolic AoP for each
 % case. Avg baseline for this pig is 96. (Should have code to extract this
 % soon) 
 Init = [data.AoP(1); 
-    data.Flow(1)/60; 
-    data.AoP(1)/96 * 50; 
-    data.AoP(1)/96 * 85; 
-    data.AoP(1)/96 * 120; 
-    data.AoP(1)/96 * 50; 
-    data.AoP(1)/96 * 85; 
-    data.AoP(1)/96 * 120;
-    5]; 
+    data.Flow(1); 
+    data.AoP(1) * (50  / 120); 
+    data.AoP(1) * (85  / 120); 
+    data.AoP(1) * (115 / 120); 
+    data.AoP(1) * (50  / 120); 
+    data.AoP(1) * (85  / 120); 
+    data.AoP(1) * (115 / 120);
+    5; 
+    ]; 
 
 %% Solve the model 
 
-sol = ode15s(@dxdt_myocardium,[0 t_final],Init, [], pars, data, 0);
+sol  = ode15s(@dxdt_myocardium,[0 t_final],Init, [], pars, data, 0);
 sols = deval(t,sol); 
 sols = sols'; 
 
@@ -92,13 +97,6 @@ Outputs.Qim_a = o(:,25);
 Outputs.Qim_v = o(:,26); 
 Outputs.Q_PV  = o(:,27); 
 
-
-figure(101)
-clf
-plot(t,Outputs.Va_epi,t,Outputs.Va_mid,t,Outputs.Va_end)
-legend('epi','mid','end')
-
-
 %% Ratios 
 
 t_idx = t>t_final-2*T & t<=t_final;
@@ -117,5 +115,20 @@ Outputs.ENDOMID = Qendo/Qmid;
 
 disp(['ENDO/EPI = ',num2str(Qendo/Qepi)]);    
 
+%% Cost function 
 
+
+Flow_cost = data.Flow(t_idx); 
+Q_PA_cost = Outputs.Q_PA(t_idx); 
+
+% Since the flows can be negative, shift the flow profiles above zero so as
+% not to divide by zero in residual 
+Flow_cost = Flow_cost + 1.1*abs(min(Flow_cost)); 
+Q_PA_cost = Q_PA_cost + 1.1*abs(min(Flow_cost));
+
+rout1 = (Q_PA_cost - Flow_cost)./Flow_cost/sqrt(length(Flow_cost));  
+rout2 = Qendo/Qepi - 1.25; 
+
+rout = [rout1; rout2]; 
+J = rout'*rout; 
 

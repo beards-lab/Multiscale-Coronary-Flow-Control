@@ -101,8 +101,6 @@ while err>1e-3 && c<100  %50
     
 end
 
-c
-
 Rest.Results = PerfusionModel( Rest, 1);
 
 return 

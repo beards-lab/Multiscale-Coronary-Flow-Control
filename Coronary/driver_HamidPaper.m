@@ -4,24 +4,21 @@ clear all
 
 printfigs_on = 0; % print plotted figures if printfigs_on = 1
 
-%% Load data and parameters 
+%% Load data 
 
-load ControlHem_OSS1150.mat ControlHem
+load ControlHamidPaper.mat ControlHem 
 
-k = 1; 
-data_control = dataprocessing(ControlHem.Data(k));
-
-% Initialize the parameters from control state 
-[pars,~,~,data_control] = parameters2(data_control); 
-
-k = 1; 
-data = dataprocessing(ControlHem.Data(k)); 
-data.pars_names = data_control.pars_names; 
+data_Control = ControlHem.Data(1); 
+data = dataprocessing(data_Control);  
 
 % structure init is formed to initialize the rest structure.
 data.Exercise_LvL = 1.00; % 1.00 means no exercise, MVO2 remains unchanged
 MVO2      = 60; % Rest MVO2
 data.MVO2 = data.Exercise_LvL*MVO2; 
+
+%% Initialize the parameters of the circulation model
+
+[pars,~,~,data] = parameters2(data); 
 
 %% Run the model 
 

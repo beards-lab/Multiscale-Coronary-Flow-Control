@@ -1,4 +1,4 @@
-clear;close all;
+clear;%close all;
 % This is the main script for running the exercise simulations. Two paths
 % are added to include source files for lumped myocardial circulation model
 % and the representative vessel model. The corresponding functions for each

@@ -51,10 +51,8 @@ Ca_mid = pars(13);
 Ca_end = pars(14); 
 Cv     = pars(15); 
 gamma  = pars(16); 
-cf_epi = pars(17); 
-rf_epi = pars(18);
-cf_mid = pars(19); 
-rf_mid = pars(20); 
+rf_epi = pars(17);
+rf_mid = pars(18); 
 
 %% State variables 
 
@@ -70,13 +68,13 @@ P_PV   = x(9);
 
 %% Auxiliary equations 
 
-Va_epi = max( cf_epi*( (Pa_epi - Pim_epi) * Ca_epi + Va_0), Vc); 
-Va_mid = max( cf_mid*( (Pa_mid - Pim_mid) * Ca_mid + Va_0), Vc); 
-Va_end = max(        ( (Pa_end - Pim_end) * Ca_end + Va_0), Vc); 
+Va_epi = max( (Pa_epi - Pim_epi) * Ca_epi + Va_0, Vc); 
+Va_mid = max( (Pa_mid - Pim_mid) * Ca_mid + Va_0, Vc); 
+Va_end = max( (Pa_end - Pim_end) * Ca_end + Va_0, Vc); 
 
-Vv_epi = cf_epi * ((Pv_epi - Pim_epi) * Cv + Vv_0); 
-Vv_mid = cf_mid * ((Pv_mid - Pim_mid) * Cv + Vv_0); 
-Vv_end =          ((Pv_end - Pim_end) * Cv + Vv_0); 
+Vv_epi = (Pv_epi - Pim_epi) * Cv + Vv_0; 
+Vv_mid = (Pv_mid - Pim_mid) * Cv + Vv_0; 
+Vv_end = (Pv_end - Pim_end) * Cv + Vv_0; 
 
 Ra_epi = rf_epi * Ra_0 * (Va_0 / Va_epi).^2; 
 Ra_mid = rf_mid * Ra_0 * (Va_0 / Va_mid).^2; 
@@ -98,39 +96,34 @@ Qm_epi = (Pa_epi - Pv_epi) / Rm_epi;
 Qm_mid = (Pa_mid - Pv_mid) / Rm_mid; 
 Qm_end = (Pa_end - Pv_end) / Rm_end; 
 
-A1 = [(Rv_epi+R_PV/2), (R_PV/2), (R_PV/2)];
-A2 = [(R_PV/2), (Rv_mid+R_PV/2), (R_PV/2)];
-A3 = [(R_PV/2), (R_PV/2), (Rv_end+R_PV/2)];
+A = [(Rv_epi+R_PV),   R_PV,           R_PV; 
+    R_PV,             (Rv_mid+R_PV),  R_PV; 
+    R_PV,             R_PV,           (Rv_end+R_PV)];
 
-A = [A1;A2;A3];
 B = [Pv_epi - P_PV; 
     Pv_mid - P_PV; 
     Pv_end - P_PV];
 
 X = A\B;
 
-Qv_epi = double(X(1));
-Qv_mid = double(X(2));
-Qv_end = double(X(3));
-
-Qv_epi = max(Qv_epi, 0);
-Qv_mid = max(Qv_mid, 0);
-Qv_end = max(Qv_end, 0);
+Qv_epi = max(X(1), 0);
+Qv_mid = max(X(2), 0);
+Qv_end = max(X(3), 0);
 
 Qim_a = Qa_epi + Qa_mid + Qa_end; 
 Qim_v = Qv_epi + Qv_mid + Qv_end; 
-Q_PV  = (P_PV - P_RA) / (R_PV / 2); 
+Q_PV  = (P_PV - P_RA) / R_PV; 
 
 %% Outputs 
 
 dP_PA    = (Q_PA - Qim_a) / C_PA; 
 dQ_PA    = (AoP - P_PA - Q_PA * R_PA) / L_PA; 
-dPa_epi  = (Qa_epi - Qm_epi) / (cf_epi * Ca_epi) + dPim_epidt; 
-dPa_mid  = (Qa_mid - Qm_mid) / (cf_mid * Ca_mid) + dPim_middt; 
-dPa_end  = (Qa_end - Qm_end) / (Ca_end)          + dPim_enddt; 
-dPv_epi  = (Qm_epi - Qv_epi) / (cf_epi * Cv)     + dPim_epidt; 
-dPv_mid  = (Qm_mid - Qv_mid) / (cf_mid * Cv)     + dPim_middt; 
-dPv_end  = (Qm_end - Qv_end) / (Cv)              + dPim_enddt;
+dPa_epi  = (Qa_epi - Qm_epi) / Ca_epi + dPim_epidt; 
+dPa_mid  = (Qa_mid - Qm_mid) / Ca_mid + dPim_middt; 
+dPa_end  = (Qa_end - Qm_end) / Ca_end + dPim_enddt; 
+dPv_epi  = (Qm_epi - Qv_epi) / Cv     + dPim_epidt; 
+dPv_mid  = (Qm_mid - Qv_mid) / Cv     + dPim_middt; 
+dPv_end  = (Qm_end - Qv_end) / Cv     + dPim_enddt;
 dP_PV    = (Qim_v - Q_PV) / C_PV; 
 
 dxdt = [dP_PA; dQ_PA; 
