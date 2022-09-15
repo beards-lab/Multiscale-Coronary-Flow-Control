@@ -6,6 +6,7 @@ Inputs:
     data - data structure loaded in 
 Outputs: 
     Outputs - output structure compiling all results 
+    
 %} 
 
 pars = exp(pars); 
@@ -17,23 +18,13 @@ t_final = t(end);
 dt = data.dt; 
 T = data.T; 
 
-AoP_M = data.AoP_M;
-
 %% Get initial conditions 
 
 % Initial conditions scaled by the average diastolic AoP for each
 % case. Avg baseline for this pig is 96. (Should have code to extract this
 % soon) 
-Init = [data.AoP(1); 
-    data.Flow(1); 
-    data.AoP(1) * (50  / 120); 
-    data.AoP(1) * (85  / 120); 
-    data.AoP(1) * (115 / 120); 
-    data.AoP(1) * (50  / 120); 
-    data.AoP(1) * (85  / 120); 
-    data.AoP(1) * (115 / 120);
-    5; 
-    ]; 
+
+Init = initialconditions(data); 
 
 %% Solve the model 
 

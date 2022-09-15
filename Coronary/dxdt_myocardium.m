@@ -16,19 +16,19 @@ Outputs:
 %% Data input 
 
 % Pressure splines
-AoP    = data.AoPspl(t); 
-PLV    = data.PLVspl(t); 
-dPLVdt = data.dPLVdtspl(t);
+P_Ao    = data.P_Aospl(t); 
+P_LV    = data.P_LVspl(t); 
+dP_LVdt = data.dP_LVdtspl(t);
 
 % Intramyocardial pressure (mmHg)
-Pim_epi = 1.2 * (1/6) * PLV; 
-Pim_mid = 1.2 * (1/2) * PLV; 
-Pim_end = 1.2 * (5/6) * PLV;
+Pim_epi = 1.2 * (1/6) * P_LV; 
+Pim_mid = 1.2 * (1/2) * P_LV; 
+Pim_end = 1.2 * (5/6) * P_LV;
 
 % Derivative of intramyocardial pressure (mmHg s^{-1))
-dPim_epidt = 1.2 * (1/6) * dPLVdt; 
-dPim_middt = 1.2 * (1/2) * dPLVdt; 
-dPim_enddt = 1.2 * (5/6) * dPLVdt; 
+dPim_epidt = 1.2 * (1/6) * dP_LVdt; 
+dPim_middt = 1.2 * (1/2) * dP_LVdt; 
+dPim_enddt = 1.2 * (5/6) * dP_LVdt; 
 
 % Right atrial pressure (mmHg)
 P_RA = 0; 
@@ -117,7 +117,7 @@ Q_PV  = (P_PV - P_RA) / R_PV;
 %% Outputs 
 
 dP_PA    = (Q_PA - Qim_a) / C_PA; 
-dQ_PA    = (AoP - P_PA - Q_PA * R_PA) / L_PA; 
+dQ_PA    = (P_Ao - P_PA - Q_PA * R_PA) / L_PA; 
 dPa_epi  = (Qa_epi - Qm_epi) / Ca_epi + dPim_epidt; 
 dPa_mid  = (Qa_mid - Qm_mid) / Ca_mid + dPim_middt; 
 dPa_end  = (Qa_end - Qm_end) / Ca_end + dPim_enddt; 

@@ -31,20 +31,20 @@ dt = mean(diff(Time));
 
 %% Extract data 
 
-AoP_B  = M_Base(:,1); 
-AoP_H1 = M_Hem1(:,1); 
-AoP_H2 = M_Hem2(:,1); 
-AoP_H3 = M_Hem3(:,1); 
+P_Ao_B  = M_Base(:,1); 
+P_Ao_H1 = M_Hem1(:,1); 
+P_Ao_H2 = M_Hem2(:,1); 
+P_Ao_H3 = M_Hem3(:,1); 
 
 Flow_B = M_Base(:,2); 
 Flow_H1 = M_Hem1(:,2); 
 Flow_H2 = M_Hem2(:,2); 
 Flow_H3 = M_Hem3(:,2); 
 
-PLV_B = M_Base(:,3); 
-PLV_H1 = M_Hem1(:,3); 
-PLV_H2 = M_Hem2(:,3); 
-PLV_H3 = M_Hem3(:,3); 
+P_LV_B = M_Base(:,3); 
+P_LV_H1 = M_Hem1(:,3); 
+P_LV_H2 = M_Hem2(:,3); 
+P_LV_H3 = M_Hem3(:,3); 
 
 %% Find mean of flows 
 
@@ -55,85 +55,85 @@ MeanFlow_H3 = mean(Flow_H3);
 
 %% Smooth out PLV 
 
-PLV_B  = smoothdata(PLV_B,'gaussian','smoothingfactor',0.015); %smoothing makes the numerics easier
-PLV_H1 = smoothdata(PLV_H1,'gaussian','smoothingfactor',0.015); %smoothing makes the numerics easier
-PLV_H2 = smoothdata(PLV_H2,'gaussian','smoothingfactor',0.015); %smoothing makes the numerics easier
-PLV_H3 = smoothdata(PLV_H3,'gaussian','smoothingfactor',0.015); %smoothing makes the numerics easier
+P_LV_B  = smoothdata(P_LV_B,'gaussian','smoothingfactor',0.015); %smoothing makes the numerics easier
+P_LV_H1 = smoothdata(P_LV_H1,'gaussian','smoothingfactor',0.015); %smoothing makes the numerics easier
+P_LV_H2 = smoothdata(P_LV_H2,'gaussian','smoothingfactor',0.015); %smoothing makes the numerics easier
+P_LV_H3 = smoothdata(P_LV_H3,'gaussian','smoothingfactor',0.015); %smoothing makes the numerics easier
 
 %% Make Pressure Derivatives 
 
-dPLV_Bdt  = diff(PLV_B)/dt; 
-dPLV_H1dt = diff(PLV_H1)/dt; 
-dPLV_H2dt = diff(PLV_H2)/dt; 
-dPLV_H3dt = diff(PLV_H3)/dt; 
+dP_LV_Bdt  = diff(P_LV_B)/dt; 
+dP_LV_H1dt = diff(P_LV_H1)/dt; 
+dP_LV_H2dt = diff(P_LV_H2)/dt; 
+dP_LV_H3dt = diff(P_LV_H3)/dt; 
 
-dPLV_Bdt  = [dPLV_Bdt(1);  dPLV_Bdt]; %Repeat the first term 
-dPLV_H1dt = [dPLV_H1dt(1); dPLV_H1dt]; %Repeat the first term 
-dPLV_H2dt = [dPLV_H2dt(1); dPLV_H2dt]; %Repeat the first term 
-dPLV_H3dt = [dPLV_H3dt(1); dPLV_H3dt]; %Repeat the first term 
+dP_LV_Bdt  = [dP_LV_Bdt(1);  dP_LV_Bdt]; %Repeat the first term 
+dP_LV_H1dt = [dP_LV_H1dt(1); dP_LV_H1dt]; %Repeat the first term 
+dP_LV_H2dt = [dP_LV_H2dt(1); dP_LV_H2dt]; %Repeat the first term 
+dP_LV_H3dt = [dP_LV_H3dt(1); dP_LV_H3dt]; %Repeat the first term 
 
 %% Make interpolants
 
-AoPspl_B  = griddedInterpolant(Time,AoP_B); 
-AoPspl_H1 = griddedInterpolant(Time,AoP_H1); 
-AoPspl_H2 = griddedInterpolant(Time,AoP_H2); 
-AoPspl_H3 = griddedInterpolant(Time,AoP_H3); 
+P_Aospl_B  = griddedInterpolant(Time,P_Ao_B); 
+P_Aospl_H1 = griddedInterpolant(Time,P_Ao_H1); 
+P_Aospl_H2 = griddedInterpolant(Time,P_Ao_H2); 
+P_Aospl_H3 = griddedInterpolant(Time,P_Ao_H3); 
 
-PLVspl_B  = griddedInterpolant(Time,PLV_B); 
-PLVspl_H1 = griddedInterpolant(Time,PLV_H1); 
-PLVspl_H2 = griddedInterpolant(Time,PLV_H2); 
-PLVspl_H3 = griddedInterpolant(Time,PLV_H3); 
+P_LVspl_B  = griddedInterpolant(Time,P_LV_B); 
+P_LVspl_H1 = griddedInterpolant(Time,P_LV_H1); 
+P_LVspl_H2 = griddedInterpolant(Time,P_LV_H2); 
+P_LVspl_H3 = griddedInterpolant(Time,P_LV_H3); 
 
-dPLV_Bdtspl  = griddedInterpolant(Time,dPLV_Bdt); 
-dPLV_H1dtspl = griddedInterpolant(Time,dPLV_H1dt); 
-dPLV_H2dtspl = griddedInterpolant(Time,dPLV_H2dt); 
-dPLV_H3dtspl = griddedInterpolant(Time,dPLV_H3dt); 
+dP_LV_Bdtspl  = griddedInterpolant(Time,dP_LV_Bdt); 
+dP_LV_H1dtspl = griddedInterpolant(Time,dP_LV_H1dt); 
+dP_LV_H2dtspl = griddedInterpolant(Time,dP_LV_H2dt); 
+dP_LV_H3dtspl = griddedInterpolant(Time,dP_LV_H3dt); 
 
 %% Make data structure 
 
-ControlHem.Data(1).Time      = Time; 
-ControlHem.Data(1).dt        = dt; 
-ControlHem.Data(1).AoP       = AoP_B; 
-ControlHem.Data(1).Flow      = Flow_B; 
-ControlHem.Data(1).MeanFlow  = MeanFlow_B; 
-ControlHem.Data(1).PLV       = PLV_B; 
-ControlHem.Data(1).dPLVdt    = dPLV_Bdt; 
-ControlHem.Data(1).AoPspl    = AoPspl_B; 
-ControlHem.Data(1).PLVspl    = PLVspl_B; 
-ControlHem.Data(1).dPLVdtspl = dPLV_Bdtspl; 
+ControlHem.Data(1).Time       = Time; 
+ControlHem.Data(1).dt         = dt; 
+ControlHem.Data(1).P_Ao       = P_Ao_B; 
+ControlHem.Data(1).Flow       = Flow_B; 
+ControlHem.Data(1).MeanFlow   = MeanFlow_B; 
+ControlHem.Data(1).P_LV       = P_LV_B; 
+ControlHem.Data(1).dP_LVdt    = dP_LV_Bdt; 
+ControlHem.Data(1).P_Aospl    = P_Aospl_B; 
+ControlHem.Data(1).P_LVspl    = P_LVspl_B; 
+ControlHem.Data(1).dP_LVdtspl = dP_LV_Bdtspl; 
 
-ControlHem.Data(2).Time      = Time; 
-ControlHem.Data(2).dt        = dt; 
-ControlHem.Data(2).AoP       = AoP_H1; 
-ControlHem.Data(2).Flow      = Flow_H1; 
-ControlHem.Data(2).MeanFlow  = MeanFlow_H1; 
-ControlHem.Data(2).PLV       = PLV_H1; 
-ControlHem.Data(2).dPLVdt    = dPLV_H1dt; 
-ControlHem.Data(2).AoPspl    = AoPspl_H1; 
-ControlHem.Data(2).PLVspl    = PLVspl_H1; 
-ControlHem.Data(2).dPLVdtspl = dPLV_H1dtspl; 
+ControlHem.Data(2).Time       = Time; 
+ControlHem.Data(2).dt         = dt; 
+ControlHem.Data(2).P_Ao       = P_Ao_H1; 
+ControlHem.Data(2).Flow       = Flow_H1; 
+ControlHem.Data(2).MeanFlow   = MeanFlow_H1; 
+ControlHem.Data(2).P_LV       = P_LV_H1; 
+ControlHem.Data(2).dP_LVdt    = dP_LV_H1dt; 
+ControlHem.Data(2).P_Aospl    = P_Aospl_H1; 
+ControlHem.Data(2).P_LVspl    = P_LVspl_H1; 
+ControlHem.Data(2).dP_LVdtspl = dP_LV_H1dtspl; 
 
-ControlHem.Data(3).Time      = Time; 
-ControlHem.Data(3).dt        = dt; 
-ControlHem.Data(3).AoP       = AoP_H2; 
-ControlHem.Data(3).Flow      = Flow_H2; 
-ControlHem.Data(3).MeanFlow  = MeanFlow_H2;  
-ControlHem.Data(3).PLV       = PLV_H2; 
-ControlHem.Data(3).dPLVdt    = dPLV_H2dt; 
-ControlHem.Data(3).AoPspl    = AoPspl_H2; 
-ControlHem.Data(3).PLVspl    = PLVspl_H2; 
-ControlHem.Data(3).dPLVdtspl = dPLV_H2dtspl; 
+ControlHem.Data(3).Time       = Time; 
+ControlHem.Data(3).dt         = dt; 
+ControlHem.Data(3).P_Ao       = P_Ao_H2; 
+ControlHem.Data(3).Flow       = Flow_H2; 
+ControlHem.Data(3).MeanFlow   = MeanFlow_H2;  
+ControlHem.Data(3).P_LV       = P_LV_H2; 
+ControlHem.Data(3).dP_LVdt    = dP_LV_H2dt; 
+ControlHem.Data(3).P_Aospl    = P_Aospl_H2; 
+ControlHem.Data(3).P_LVspl    = P_LVspl_H2; 
+ControlHem.Data(3).dP_LVdtspl = dP_LV_H2dtspl; 
 
-ControlHem.Data(4).Time      = Time; 
-ControlHem.Data(4).dt        = dt; 
-ControlHem.Data(4).AoP       = AoP_H3; 
-ControlHem.Data(4).Flow      = Flow_H3; 
-ControlHem.Data(4).MeanFlow  = MeanFlow_H3; 
-ControlHem.Data(4).PLV       = PLV_H3; 
-ControlHem.Data(4).dPLVdt    = dPLV_H3dt; 
-ControlHem.Data(4).AoPspl    = AoPspl_H3; 
-ControlHem.Data(4).PLVspl    = PLVspl_H3; 
-ControlHem.Data(4).dPLVdtspl = dPLV_H3dtspl; 
+ControlHem.Data(4).Time       = Time; 
+ControlHem.Data(4).dt         = dt; 
+ControlHem.Data(4).P_Ao       = P_Ao_H3; 
+ControlHem.Data(4).Flow       = Flow_H3; 
+ControlHem.Data(4).MeanFlow   = MeanFlow_H3; 
+ControlHem.Data(4).P_LV       = P_LV_H3; 
+ControlHem.Data(4).dP_LVdt    = dP_LV_H3dt; 
+ControlHem.Data(4).P_Aospl    = P_Aospl_H3; 
+ControlHem.Data(4).P_LVspl    = P_LVspl_H3; 
+ControlHem.Data(4).dP_LVdtspl = dP_LV_H3dtspl; 
 
 %% Point values
  
@@ -160,7 +160,7 @@ for i = 1:length(PointValues(:,1))
     ControlHem.Data(i).HR       = PointValues(i,4); % Heart rate 
     ControlHem.Data(i).T        = 60 / ControlHem.Data(i).HR; % Heart period
     ControlHem.Data(i).CorFlow  = PointValues(i,5); 
-    ControlHem.Data(i).PLVmin   = PointValues(i,7); 
+    ControlHem.Data(i).P_LVmin  = PointValues(i,7); 
     ControlHem.Data(i).dPdtmax  = PointValues(i,8);
     ControlHem.Data(i).dPdtmin  = PointValues(i,9); 
     ControlHem.Data(i).tauhalf  = PointValues(i,10);
@@ -182,8 +182,4 @@ for i = 1:length(PointValues(:,1))
 end 
 
 save ControlHem_OSS1150.mat ControlHem
-
-MBP = (1/3) * SBP + (2/3) * DBP
-
-
 

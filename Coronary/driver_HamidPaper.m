@@ -29,8 +29,8 @@ Outputs = model_sol(pars,data);
 scale = data.scale; 
 t = data.t; 
 Flow = data.Flow * 60 / scale; 
-PLV = data.PLV; 
-AoP = data.AoP; 
+P_LV  = data.P_LV; 
+P_Ao = data.P_Ao; 
 
 % Scale flows to mL min^{-1}
 Q_PA   = Outputs.Q_PA   * 60 / scale; 
@@ -70,8 +70,8 @@ legend([h(2),h(1)],{'Data','Model'},'Location','northeast')
 h3 = figure(13);
 clf
 hold on
-plot(t,AoP,'linewidth',1.5)
-plot(t,PLV,'Color',[1 0 0 0.4],'linewidth',1.5)
+plot(t,P_Ao,'linewidth',1.5)
+plot(t,P_LV,'Color',[1 0 0 0.4],'linewidth',1.5)
 %plot(t,P_PA,'r','linewidth',1.5)
 ylabel('Pressure (mmHg)')
 xlabel('Time (s)')
@@ -86,7 +86,7 @@ hold on
 plot(t,Pa_end,'b','LineWidth',2)
 plot(t,Pa_mid,'g','LineWidth',2)
 plot(t,Pa_epi,'r','LineWidth',2)
-plot(t,PLV,'Color',[0 0 0 0.2],'linewidth',1.5)
+plot(t,P_LV,'Color',[0 0 0 0.2],'linewidth',1.5)
 xlim([t(1) t(end)])
 xlabel('Time (s)')
 ylabel('Pressure (mmHg)')

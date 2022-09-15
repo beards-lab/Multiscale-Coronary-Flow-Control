@@ -23,79 +23,48 @@ dt = mean(diff(Time));
 %% Extract data 
 
 Flow_B = M_Base(:,1); 
-AoP_B  = M_Base(:,2); 
-PLV_B  = M_Base(:,3); 
+P_Ao_B  = M_Base(:,2); 
+P_LV_B  = M_Base(:,3); 
 
 %% Find mean of flows 
 
 MeanFlow_B = mean(M_Base(:,1)); 
-% MeanFlow_H1 = mean(M_Hem1(:,2)); 
-% MeanFlow_H2 = mean(M_Hem2(:,2)); 
-% MeanFlow_H3 = mean(M_Hem3(:,2)); 
 
 %% Smooth out PLV 
 
-PLV_B   = 0.85*(PLV_B-17);
-PLV_B   = smoothdata(PLV_B,'gaussian','smoothingfactor',0.015); 
-
-%PLV_B = smoothdata(M_Base(:,3),'gaussian','smoothingfactor',0.015); %smoothing makes the numerics easier
-% PLV_H1 = smoothdata(M_Hem1(:,3),'gaussian','smoothingfactor',0.015); %smoothing makes the numerics easier
-% PLV_H2 = smoothdata(M_Hem2(:,3),'gaussian','smoothingfactor',0.015); %smoothing makes the numerics easier
-% PLV_H3 = smoothdata(M_Hem3(:,3),'gaussian','smoothingfactor',0.015); %smoothing makes the numerics easier
+P_LV_B   = 0.85*(P_LV_B-17);
+P_LV_B   = smoothdata(P_LV_B,'gaussian','smoothingfactor',0.015); 
 
 
 %% Make Pressure Derivatives 
 
-dPLV_Bdt = diff(PLV_B)/dt; 
-dPLV_Bdt = [dPLV_Bdt(1); dPLV_Bdt]; %Repeat the first term 
+dP_LV_Bdt = diff(P_LV_B)/dt; 
+dP_LV_Bdt = [dP_LV_Bdt(1); dP_LV_Bdt]; %Repeat the first term 
 
 %% Make interpolants
 
-AoPspl_B    = griddedInterpolant(Time,AoP_B); 
-PLVspl_B    = griddedInterpolant(Time,PLV_B); 
-dPLV_Bdtspl = griddedInterpolant(Time,dPLV_Bdt); 
+P_Aospl_B    = griddedInterpolant(Time,P_Ao_B); 
+P_LVspl_B    = griddedInterpolant(Time,P_LV_B); 
+dP_LV_Bdtspl = griddedInterpolant(Time,dP_LV_Bdt); 
 
 %% Make data structure 
 
 ControlHem.Data(1).Time = Time - Time(1); 
 ControlHem.Data(1).dt   = dt; 
 
-ControlHem.Data(1).AoP       = AoP_B; 
-ControlHem.Data(1).Flow      = Flow_B; 
-ControlHem.Data(1).MeanFlow  = MeanFlow_B; 
-ControlHem.Data(1).PLV       = PLV_B; 
-ControlHem.Data(1).dPLVdt    = dPLV_Bdt; 
-ControlHem.Data(1).AoPspl    = AoPspl_B; 
-ControlHem.Data(1).PLVspl    = PLVspl_B; 
-ControlHem.Data(1).dPLVdtspl = dPLV_Bdtspl; 
-
-% ControlHem.Data(2).AoP      = M_Hem1(:,1); 
-% ControlHem.Data(2).Flow     = M_Hem1(:,2); 
-% ControlHem.Data(2).MeanFlow = MeanFlow_H1; 
-% ControlHem.Data(2).PLV      = PLV_H1; 
-% 
-% ControlHem.Data(3).AoP      = M_Hem2(:,1); 
-% ControlHem.Data(3).Flow     = M_Hem2(:,2); 
-% ControlHem.Data(3).MeanFlow = MeanFlow_H2;  
-% ControlHem.Data(3).PLV      = PLV_H2; 
-% 
-% ControlHem.Data(4).AoP      = M_Hem3(:,1); 
-% ControlHem.Data(4).Flow     = M_Hem3(:,2); 
-% ControlHem.Data(4).MeanFlow = MeanFlow_H3; 
-% ControlHem.Data(4).PLV      = PLV_H3;
+ControlHem.Data(1).P_Ao       = P_Ao_B; 
+ControlHem.Data(1).Flow       = Flow_B; 
+ControlHem.Data(1).MeanFlow   = MeanFlow_B; 
+ControlHem.Data(1).P_LV       = P_LV_B; 
+ControlHem.Data(1).dP_LVdt    = dP_LV_Bdt; 
+ControlHem.Data(1).P_Aospl    = P_Aospl_B; 
+ControlHem.Data(1).P_LVspl    = P_LVspl_B; 
+ControlHem.Data(1).dP_LVdtspl = dP_LV_Bdtspl; 
 
 
 %% Point values
- 
-% LVWeight = readmatrix('06092021_Control_Hemorrhage_OSS1150.xlsx',...
-%     'Sheet','AveragedData',...
-%     'Range','B2:B2'); 
 
-% PointValues = readmatrix('06092021_Control_Hemorrhage_OSS1150.xlsx',...
-%     'Sheet','AveragedData',...
-%     'Range','C2:W5'); 
-
-ControlHem.Data(1).LVWeight = 81.87; %LVWeight; 
+ControlHem.Data(1).LVWeight = 81.87; 
 
 % Viscosity function from Snyder 1971 - Influence of temperature and hematocriton blood viscosity 
 k0 = 0.0322;
@@ -111,7 +80,7 @@ ControlHem.Data(i).MBP      = [0]; %PointValues(i,3);
 ControlHem.Data(i).HR       = 84.45; %PointValues(i,4); 
 ControlHem.Data(i).T        = 60/ControlHem.Data(i).HR; 
 ControlHem.Data(i).CorFlow  = [0]; %PointValues(i,5); 
-ControlHem.Data(i).PLVmin   = [0]; %PointValues(i,7); 
+ControlHem.Data(i).P_LVmin  = [0]; %PointValues(i,7); 
 ControlHem.Data(i).dPdtmax  = [0]; %PointValues(i,8);
 ControlHem.Data(i).dPdtmin  = [0]; %PointValues(i,9); 
 ControlHem.Data(i).tauhalf  = [0]; %PointValues(i,10);
