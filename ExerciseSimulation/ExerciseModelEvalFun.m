@@ -53,6 +53,7 @@ Init =   Calculations_Exercise(Init, 'Baseline');
 % Copy initialization to Rest
 Rest = Init;
 QPA = Rest.QPA;
+ 
 
 %% Run rest
 % The while loop iterates over the two models successively, starting with

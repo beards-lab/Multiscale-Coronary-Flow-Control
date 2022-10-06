@@ -4,9 +4,9 @@ function [var_endo, var_mid, var_epi] = CycleAvg_Exercise(test, var)
 % test : the structure that includes each state of simulation
 % (rest/exercise/init)
    
-eval(['SubendoVar = test.Results.',var,'3;']);
-eval(['MidVar = test.Results.',var,'2;']);
-eval(['SubepiVar = test.Results.',var,'1;']);
+eval(['SubendoVar = test.Results.',var,'3;']);  %Q13 - Qa_end
+eval(['MidVar = test.Results.',var,'2;']);      %Q12 - Qa_mid
+eval(['SubepiVar = test.Results.',var,'1;']);   %Q11 - Qa_epi
 eval(['t = test.Results.t;']);
 eval('t_final = test.Results.t(end);');
 eval('T = test.T;');

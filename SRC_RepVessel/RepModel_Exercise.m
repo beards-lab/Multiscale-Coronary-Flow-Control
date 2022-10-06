@@ -39,7 +39,7 @@ Dc = Control.Dexp; %100
 Pc = Control.Ptm; %1
 
 % a_Dc = State.Dexp/Dc
-% a_Pc = State.Ptm/Pc
+% a_Pc = State.Ptm/Pc   
 
 % Run the representative vessel model:
 [DE, ActE, S_myo, S_meta, S_HR] = CarlsonModelTime(x, State.Ptm, State.Dexp,...
